@@ -17,7 +17,7 @@ The reward is sparse, and inversely proportional to the amount of gates needed t
 First clone/download the repo. Then (preferably in a fresh virtual environment):
 
 ```
-cd gym-quantcircuit
+cd quantumcircuit-gym
 conda install -c conda-forge qutip
 while read requirement; do conda install --yes $requirement; done < conda_reqs.txt
 pip install -r requirements.txt
