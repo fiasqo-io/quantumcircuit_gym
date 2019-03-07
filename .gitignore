@@ -1,0 +1,12 @@
+bin/
+cmake/
+contrib/
+include/
+lib/
+lib64/
+share/
+src/
+CMakeLists.txt
+*.cfg
+*.egg-info
+*.ipynb_checkpoints
