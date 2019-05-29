@@ -1,6 +1,6 @@
 
 Gym Environment for Quantum Circuit Synthesis (using qiskit and qutip)
-======================================================================
+***************************************************************************
 
 A custom gym environment for creating quantum circuits using IBMQ's qiskit library for python. Options include:
 
