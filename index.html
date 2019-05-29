@@ -34,7 +34,8 @@
 <h1>Welcome to quantumcircuit_gym’s documentation!<a class="headerlink" href="#welcome-to-quantumcircuit-gym-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="gym-environment-for-quantum-circuit-synthesis-using-qiskit-and-qutip">
 <h2>Gym Environment for Quantum Circuit Synthesis (using qiskit and qutip)<a class="headerlink" href="#gym-environment-for-quantum-circuit-synthesis-using-qiskit-and-qutip" title="Permalink to this headline">¶</a></h2>
-<p>A custom gym environment for creating quantum circuits using IBMQ’s qiskit library for python. Options include:</p>
+<p>A custom gym environment for the generation of optimal quantum circuits which perform a given computational task,
+using IBMQ’s Qiskit library for Python. Options include:</p>
 <ol class="arabic simple">
 <li><p>Defining size of the circuit in terms of number of qubits</p></li>
 <li><p>Choosing whether to use unitary matrices or statevectors</p></li>
@@ -42,8 +43,16 @@
 <li><p>Choosing the physical connectivity of the qubits, predefined or custom</p></li>
 <li><p>Choosing initial goal states or unitaries</p></li>
 </ol>
-<p>A step in the environment is defined as applying one single gate from the defined gate group to a specific qubit, with all possible combinations of gate/qubit pairs (or triplets in case of a two qubit gate) being generated based on the defined connectivity.</p>
-<p>The reward is sparse, and inversely proportional to the amount of gates needed to get to the goal - incentivising smaller circuits. Alternatives are currently being investigated.</p>
+<p>A step in the environment is defined as applying one single gate from the defined gate group to a specific qubit,
+with all possible combinations of gate/qubit pairs (or triplets in case of a two qubit gate) being generated based on the defined connectivity.</p>
+<p>The reward is sparse, and inversely proportional to the amount of gates needed to get to the goal - incentivising smaller circuits.
+Experimentation with custom reward functions is encouraged.</p>
+<div class="section" id="qiskit-integration">
+<h3>Qiskit Integration<a class="headerlink" href="#qiskit-integration" title="Permalink to this headline">¶</a></h3>
+<p>Qiskit is central to this environment, providing the QuantumCircuit class that allows the sequential application of gates
+to construct a circuit representation of a unitary process. This facilitates the simulation of a given circuit using the Aer backend
+in order to obtain the resultant quantum state. The library also provides a tool to visualise the current circuit using standard literature conventions.</p>
+</div>
 <div class="section" id="installation">
 <h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
 <p>First clone/download the repo. Then (preferably in a fresh virtual environment):</p>
@@ -275,14 +284,6 @@ take the difference (p_0 - p_1) and return the value of the trace distance</p>
 </dd></dl>
 
 </div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
 </div>
 
 
