@@ -6,11 +6,7 @@
 Welcome to quantumcircuit_gym's documentation!
 ==============================================
 
-.. toctree::
-   :maxdepth: 3
-   :caption: Contents:
-
-   includeme
+.. include: includeme
 
 
 
