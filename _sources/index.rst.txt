@@ -6,7 +6,8 @@
 Welcome to quantumcircuit_gym's documentation!
 ==============================================
 
-.. include: includeme
+.. include:: includeme.rst
+.. include:: documentation.rst
 
 
 
