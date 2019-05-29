@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'quantumcircuit_gym'
-copyright = '2019, Matthew Rose, Tyler Jones, Xavier Poncini, Kaiah Steven'
-author = 'Matthew Rose, Tyler Jones, Xavier Poncini, Kaiah Steven'
+copyright = '2019, Max Kelsen'
+author = 'Max Kelsen'
 
 # The full version, including alpha/beta/rc tags
 release = '2019'
