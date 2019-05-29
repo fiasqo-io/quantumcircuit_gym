@@ -6,6 +6,8 @@
 Welcome to quantumcircuit_gym's documentation!
 ==============================================
 
+.. mdinclude:: README.md
+
 .. automodule:: gym_quantcircuit
 .. autoclass:: gym_quantcircuit.envs.QuantCircuitEnv
     :members:
