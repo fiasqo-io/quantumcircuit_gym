@@ -10,9 +10,3 @@ Welcome to quantumcircuit_gym's documentation!
 .. include:: documentation.rst
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
