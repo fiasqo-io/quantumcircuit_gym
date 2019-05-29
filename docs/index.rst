@@ -6,15 +6,9 @@
 Welcome to quantumcircuit_gym's documentation!
 ==============================================
 
-.. automodule:: gym_quantcircuit
-.. autoclass:: gym_quantcircuit.envs.QuantCircuitEnv
-    :members:
+.. include:: includeme.rst
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
 
-   includeme
 
 
 
