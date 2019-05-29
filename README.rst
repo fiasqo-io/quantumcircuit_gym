@@ -33,4 +33,4 @@ In progress: better installation automation
 Example use
 -----------
 
-Most methods displayed in `tutorial notebook <gym-quantcircuit-tutorial.ipynb>`_.
+Most methods displayed in `tutorial notebook <https://github.com/MaxKelsen/quantumcircuit_gym/blob/master/gym-quantcircuit-tutorial.ipynb>`_.
