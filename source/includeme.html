@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>&lt;no title&gt; &#8212; quantumcircuit_gym 2019 documentation</title>
+    <title>Gym Environment for Quantum Circuit Synthesis (using qiskit and qutip) &#8212; quantumcircuit_gym 2019 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -30,7 +30,8 @@
 
           <div class="body" role="main">
             
-  <p># Gym Environment for Quantum Circuit Synthesis (using qiskit and qutip)</p>
+  <div class="section" id="gym-environment-for-quantum-circuit-synthesis-using-qiskit-and-qutip">
+<h1>Gym Environment for Quantum Circuit Synthesis (using qiskit and qutip)<a class="headerlink" href="#gym-environment-for-quantum-circuit-synthesis-using-qiskit-and-qutip" title="Permalink to this headline">¶</a></h1>
 <p>A custom gym environment for creating quantum circuits using IBMQ’s qiskit library for python. Options include:</p>
 <ol class="arabic simple">
 <li><p>Defining size of the circuit in terms of number of qubits</p></li>
@@ -41,18 +42,23 @@
 </ol>
 <p>A step in the environment is defined as applying one single gate from the defined gate group to a specific qubit, with all possible combinations of gate/qubit pairs (or triplets in case of a two qubit gate) being generated based on the defined connectivity.</p>
 <p>The reward is sparse, and inversely proportional to the amount of gates needed to get to the goal - incentivising smaller circuits. Alternatives are currently being investigated.</p>
-<p>## Installation</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>First clone/download the repo. Then (preferably in a fresh virtual environment):</p>
-<p><code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">cd</span> <span class="pre">quantumcircuit-gym</span>
-<span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">conda-forge</span> <span class="pre">qutip</span>
-<span class="pre">while</span> <span class="pre">read</span> <span class="pre">requirement;</span> <span class="pre">do</span> <span class="pre">conda</span> <span class="pre">install</span> <span class="pre">--yes</span> <span class="pre">$requirement;</span> <span class="pre">done</span> <span class="pre">&lt;</span> <span class="pre">conda_reqs.txt</span>
-<span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span>
-<span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span>
-<span class="pre">`</span></code>
-In progress: better installation automation</p>
-<p>## Example use
-Most methods displayed in [tutorial notebook](gym-quantcircuit-tutorial.ipynb).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cd quantumcircuit-gym
+conda install -c conda-forge qutip
+while read requirement; do conda install --yes $requirement; done &lt; conda_reqs.txt
+pip install -r requirements.txt
+pip install -e .
+</pre></div>
+</div>
+<p>In progress: better installation automation</p>
+</div>
+<div class="section" id="example-use">
+<h2>Example use<a class="headerlink" href="#example-use" title="Permalink to this headline">¶</a></h2>
+<p>Most methods displayed in <a class="reference external" href="gym-quantcircuit-tutorial.ipynb">tutorial notebook</a>.</p>
+</div>
+</div>
 
 
           </div>
