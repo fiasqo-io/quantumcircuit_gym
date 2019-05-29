@@ -6,11 +6,8 @@
 Welcome to quantumcircuit_gym's documentation!
 ==============================================
 
-.. include: includeme
-
-
-
-
+.. include:: include_readme.rst
+.. include:: documentation.rst
 
 
 Indices and tables

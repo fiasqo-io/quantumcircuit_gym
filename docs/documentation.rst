@@ -1,5 +1,3 @@
-.. include:: ../README.rst
-
 Documentation
 **************
 .. automodule:: gym_quantcircuit
