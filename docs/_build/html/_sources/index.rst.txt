@@ -1,0 +1,24 @@
+.. quantumcircuit_gym documentation master file, created by
+   sphinx-quickstart on Fri May 24 16:54:46 2019.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to quantumcircuit_gym's documentation!
+==============================================
+
+.. automodule:: gym_quantcircuit
+.. autoclass:: gym_quantcircuit.envs.QuantCircuitEnv
+    :members:
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

@@ -1,0 +1,275 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Welcome to quantumcircuit_gym’s documentation! &#8212; quantumcircuit_gym 2019 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gym_quantcircuit">
+<span id="welcome-to-quantumcircuit-gym-s-documentation"></span><h1>Welcome to quantumcircuit_gym’s documentation!<a class="headerlink" href="#module-gym_quantcircuit" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv">
+<em class="property">class </em><code class="descclassname">gym_quantcircuit.envs.</code><code class="descname">QuantCircuitEnv</code><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.c_s_gate">
+<code class="descname">c_s_gate</code><span class="sig-paren">(</span><em>target</em>, <em>control</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.c_s_gate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates custom composite gate from defined qiskit gates that is contained in the IQP group</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>target (int): index of the target qubit
+control (int): index of the control qubit</p>
+</dd>
+<dt>Return:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.define_connectivity">
+<code class="descname">define_connectivity</code><span class="sig-paren">(</span><em>connectivity</em>, <em>custom_matrix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.define_connectivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a binary matrix that describes the connections between qubits</p>
+<dl>
+<dt>Args:</dt><dd><p>connectivity (str): string representation of connectivity format
+custom_matrix (np.array): binary array with index pairs denoting a connection between those two qubits i.e. (i,j) = 1 if qubit i is connected</p>
+<blockquote>
+<div><p>to qubit j. This is a one way mapping, if two way connectivity is desired the array must be symmetric about the diagonal.</p>
+</div></blockquote>
+</dd>
+<dt>Return:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.define_goal">
+<code class="descname">define_goal</code><span class="sig-paren">(</span><em>goal_state</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.define_goal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines goal statevector or unitary matrix for the circuit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>goal_state (list): flattened statevector or unitary matrix</p>
+</dd>
+<dt>Return:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.fidelity">
+<code class="descname">fidelity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.fidelity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates fidelity of current and goal state/unitary.</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>fid (float): fidelity measure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.make_curriculum">
+<code class="descname">make_curriculum</code><span class="sig-paren">(</span><em>num_gates</em>, <em>loop_list=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.make_curriculum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Designs curriculum for agent which gradually increases goal difficulty.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num_gates (int): max number of gates for a circuit in the curriculum
+loop_list (list): A list of times you want to loop each curriculum stage</p>
+</dd>
+<dt>Return:</dt><dd><p>curriculum (list): list of goal unitaries/statevectors for the agent to target
+tracker (array): array of how many goals found in each section</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.plot_connectivity_graph">
+<code class="descname">plot_connectivity_graph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.plot_connectivity_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws a graph of nodes and edges that represents the physical connectivity of the qubits.
+Graph will not be completely symmetric and will not be an exact replica of the framework, but will 
+provide an accurate visual representation of the connections between qubits.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.render">
+<code class="descname">render</code><span class="sig-paren">(</span><em>close=False</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.render" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Return:</dt><dd><p>text drawing of the current circuit represented by the QuantumCircuit object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the circuit to empty and any relevant variables to their initial state</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>diff (list): real and imaginary parts of the current reset quantum state/unitary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.sample" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Return:</dt><dd><p>action (int): a specific action in the circuit environment action space</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.set_gate_group">
+<code class="descname">set_gate_group</code><span class="sig-paren">(</span><em>gate_group</em>, <em>custom_gates=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.set_gate_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the gate group to be used within the enviroment</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>gate_group (str): name of the gate group used
+custom_gates (dict): A set of custom gates may be defined using a dictionary, the form looks like{“gate_name”:gate_function}</p>
+</dd>
+<dt>Returns: </dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.step">
+<code class="descname">step</code><span class="sig-paren">(</span><em>action</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a single step (action) inside the environment</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>action (int): index of the action in self.gate_list generated by self._create_gates - containing all combinations of legal qubit/gate combinations</p>
+</dd>
+<dt>Return:</dt><dd><p>diff (np.array): difference between current and goal state
+reward (float): reward gained from taking the specified action
+done (bool): True if agent has reached the goal, False otherwise
+measures (dict): dictionary containing the measure used to determine reward</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.trace_norm">
+<code class="descname">trace_norm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.trace_norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates trace norms of density state of matrix - to use this as a metric,
+take the difference (p_0 - p_1) and return the value of the trace distance</p>
+<dl class="simple">
+<dt>Return:</dt><dd><p>dist (float): trace distance of difference between density matrices</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gym_quantcircuit.envs.QuantCircuitEnv.var_init">
+<code class="descname">var_init</code><span class="sig-paren">(</span><em>num_qubits</em>, <em>unitary=False</em>, <em>gate_group='pauli'</em>, <em>connectivity='nearest_neighbour'</em>, <em>goal_state=None</em>, <em>goal_unitary=None</em>, <em>custom_gates=None</em>, <em>custom_connectivity=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.var_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises the Quantum Circuit Environment object with arguments since gym.make can’t do this.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num_qubits (int): number of qubits in the desired circuit
+unitary (bool): if True sets environment to use unitary matrices, otherwise uses statevectors
+gate_group (str): string to define the gate group used, options include ‘pauli’,’clifford’ and ‘IQP’
+goal_state (list): list of complex values defining goal statevector - must have 2**num_qubits values
+goal_unitary (np.array): goal unitary matrix - must have shape (2**num_qubits,2**num_qubits)</p>
+</dd>
+<dt>Return:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">quantumcircuit_gym</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Matthew Rose, Tyler Jones, Xavier Poncini, Kaiah Steven.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
