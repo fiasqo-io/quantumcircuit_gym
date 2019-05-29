@@ -1,16 +1,23 @@
+import itertools as it
+
 import gym
-from gym import error,spaces,utils
+from gym import error, spaces, utils
 from gym.utils import seeding
 
 import qiskit
 from qiskit import QuantumRegister, QuantumCircuit, execute, Aer
-from qutip import *
+from qutip import qeye, basis, Qobj, fidelity, hadamard_transform, qubit_states, tracedist
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
-import itertools as it
+
 
 class QuantCircuitEnv(gym.Env):
+    """
+    A quantum circuit implementation using the Qiskit library, containing methods to construct
+    and simulate quantum circuits designed to perform specific operations. Mainly for use in
+    Reinforcement Learning with an agent choosing and learning actions for a specific goal.
+    """
 
     def __init__(self):
         pass
@@ -25,19 +32,28 @@ class QuantCircuitEnv(gym.Env):
                  custom_gates=None,
                  custom_connectivity=None):
         """
-        Initialises the Quantum Circuit Environment object with arguments since gym.make can't do this.
+        Initialises the Quantum Circuit Environment object with arguments since gym.make can't
+        do so.
 
         Args:
             num_qubits (int): number of qubits in the desired circuit
-            unitary (bool): if True sets environment to use unitary matrices, otherwise uses statevectors
-            gate_group (str): string to define the gate group used, options include 'pauli','clifford' and 'IQP'
-            goal_state (list): list of complex values defining goal statevector - must have 2**num_qubits values
-            goal_unitary (np.array): goal unitary matrix - must have shape (2**num_qubits,2**num_qubits)
+            unitary (bool): if True sets environment to use unitary matrices,
+                            otherwise uses statevectors
+            gate_group (str): string to define the gate group used,
+                              options include 'pauli','clifford' and 'IQP'
+            goal_state (list): list of complex values defining goal statevector,
+                               must have 2**num_qubits values
+            goal_unitary (np.array): goal unitary matrix,
+                                     must have shape (2**num_qubits, 2**num_qubits)
+            custom_gates (list): list of gate functions to use in the circuit
+            custom_connectivity (np.array): a NxN binary matrix where N is the number of qubits,
+                                            with entry [i,j] = 1 when qubit i is physically
+                                            connected to qubit j.
 
         Return:
             None
 
-        """ 
+        """
         # Define whether using unitaries or statevectors
         try:
             self.is_unitary = bool(unitary)
@@ -58,31 +74,33 @@ class QuantCircuitEnv(gym.Env):
 
         # Initialise current/goal statevectors
         self.current_state = [1+0j] + [0+0j]*(self.dimension - 1)
-        self.comp_state = np.append(np.real(self.current_state),np.imag(self.current_state)) # concatenate real and imaginary parts of statevector into one array
-        
-        if goal_state == None:
+        # concatenate real and imaginary parts of statevector into one array
+        self.comp_state = np.append(np.real(self.current_state), np.imag(self.current_state))
+
+        if goal_state is None:
             self.goal_state = [1+0j]+[0+0j]*(self.dimension-1)
         else:
             assert len(goal_state) == self.dimension, 'Goal state is not correct length.'
             self.goal_state = goal_state
 
-        self.comp_goal = np.append(np.real(self.goal_state),np.imag(self.goal_state))
+        self.comp_goal = np.append(np.real(self.goal_state), np.imag(self.goal_state))
 
         # Initialise unitaries
         if self.is_unitary:
             self.current_unitary = qeye(self.dimension).full()
-            if goal_unitary ==  None:
+            if goal_unitary is None:
                 self.goal_unitary = qeye(self.dimension).full()
             else:
-                assert np.asarray(goal_unitary).shape == (self.dimension,self.dimension), 'Goal unitary is not correct shape.'
+                assert np.asarray(goal_unitary).shape == (self.dimension, self.dimension), ('Goal '
+                'unitary is not correct shape.')
                 self.goal_unitary = goal_unitary
-    
+
         # Define gate group used
         self.gate_group = gate_group
-        self.set_gate_group(gate_group,custom_gates)
+        self.set_gate_group(gate_group, custom_gates)
 
         # Initialise qubit connectivity
-        self.define_connectivity(connectivity,custom_connectivity)
+        self.define_connectivity(connectivity, custom_connectivity)
 
         # Initialise gate list
         self.gate_list = self._create_gates()
@@ -95,12 +113,13 @@ class QuantCircuitEnv(gym.Env):
         self.EPS = 1e-10
         self.has_run = False
 
-    def step(self,action):
+    def step(self, action):
         """
         Takes a single step (action) inside the environment
 
         Args:
-            action (int): index of the action in self.gate_list generated by self._create_gates - containing all combinations of legal qubit/gate combinations
+            action (int): index of the action in self.gate_list generated by self._create_gates -
+                          containing all combinations of legal qubit/gate combinations
 
         Return:
             diff (np.array): difference between current and goal state
@@ -111,7 +130,7 @@ class QuantCircuitEnv(gym.Env):
         """
         if not self.has_run:
             self.set_gate_group(self.gate_group)
-            self.gate_list=self._create_gates()
+            self.gate_list = self._create_gates()
             self.has_run = True
 
         assert action in range(self.action_space_n), 'Not a valid action.'
@@ -123,37 +142,40 @@ class QuantCircuitEnv(gym.Env):
         extra = 0
 
         # Keep track of number of gates used
-        self.gate_count +=1
+        self.gate_count += 1
 
         # Check if multi-qubit gate - self.gate_list[action][0] is a tuple of the qubits
-        if len(self.gate_list[action][0])>1:
+        if len(self.gate_list[action][0]) > 1:
             # Apply gate to circuit - the second arg of the tuple is the gate function
-            self.gate_list[action][1](self.q_reg[self.gate_list[action][0][0]],self.q_reg[self.gate_list[action][0][1]])
+            self.gate_list[action][1](self.q_reg[self.gate_list[action][0][0]],
+                                      self.q_reg[self.gate_list[action][0][1]])
         else:
             # Do the same but for single qubit gates
             self.gate_list[action][1](self.q_reg[self.gate_list[action][0][0]])
 
         # Unitary case
         if self.is_unitary:
-            self.job = execute(self.qcircuit,backend=qiskit.BasicAer.get_backend('unitary_simulator'))
-            self.current_unitary=self.job.result().get_unitary(self.qcircuit)
+            self.job = execute(self.qcircuit,
+                               backend=qiskit.BasicAer.get_backend('unitary_simulator'))
+            self.current_unitary = self.job.result().get_unitary(self.qcircuit)
             diff = np.asarray(self.goal_unitary-self.current_unitary).flatten()
-            diff = np.append(np.real(diff),np.imag(diff))
+            diff = np.append(np.real(diff), np.imag(diff))
         # Statevector case
         else:
-            self.job = execute(self.qcircuit,backend=qiskit.BasicAer.get_backend('statevector_simulator'))
+            self.job = execute(self.qcircuit,
+                               backend=qiskit.BasicAer.get_backend('statevector_simulator'))
             self.current_state = self.job.result().get_statevector(self.qcircuit)
-            self.comp_state = np.append(np.real(self.current_state),np.imag(self.current_state))
+            self.comp_state = np.append(np.real(self.current_state), np.imag(self.current_state))
             diff = self.comp_goal - self.comp_state
 
         reward = 0
 
         # Reward inversely proportional to number of gates used if fidelity is hit
-        if round(self.fidelity(),3) == 1:
+        if round(self.fidelity(), 3) == 1:
             reward = 50*(1/(self.gate_count+1))
             done = True
 
-        return diff, reward, done, {'fidelity': round(self.fidelity(),3)}
+        return diff, reward, done, {'fidelity': round(self.fidelity(), 3)}
 
     def reset(self):
         """
@@ -168,19 +190,19 @@ class QuantCircuitEnv(gym.Env):
         self.current_state = [1+0j]+[0+0j]*(2**self.num_qubits-1)
         self.current_unitary = qeye(2**self.num_qubits).full()
 
-        self.comp_state = np.append(np.real(self.current_state),np.imag(self.current_state))
+        self.comp_state = np.append(np.real(self.current_state), np.imag(self.current_state))
         self.gate_count = 0
         self.has_run = False
 
         if self.is_unitary:
             diff = np.asarray(self.goal_unitary-self.current_unitary).flatten()
-            diff = np.append(np.real(diff),np.imag(diff))
+            diff = np.append(np.real(diff), np.imag(diff))
         else:
             diff = self.comp_goal - self.comp_state
 
         return diff
 
-    def render(self,close=False):
+    def render(self):
         """
         Return:
             text drawing of the current circuit represented by the QuantumCircuit object
@@ -188,13 +210,13 @@ class QuantCircuitEnv(gym.Env):
         """
         return self.qcircuit.draw()
 
-    def define_goal(self,goal_state):
+    def define_goal(self, goal_state):
         """
         Defines goal statevector or unitary matrix for the circuit.
 
         Args:
             goal_state (list): flattened statevector or unitary matrix
-        
+
         Return:
             None
 
@@ -205,45 +227,45 @@ class QuantCircuitEnv(gym.Env):
         elif not self.is_unitary:
             assert len(goal_state) == len(self.current_state)
             self.goal_state = goal_state
-            self.comp_goal = np.append(np.real(goal_state),np.imag(goal_state))
-        
-        return None
+            self.comp_goal = np.append(np.real(goal_state), np.imag(goal_state))
 
     def sample(self):
         """
         Return:
             action (int): a specific action in the circuit environment action space
-        
+
         """
-        action = np.random.randint(0,self.action_space_n)
+        action = np.random.randint(0, self.action_space_n)
         return action
 
     def fidelity(self):
         """
         Calculates fidelity of current and goal state/unitary.
-        
+
         Return:
             fid (float): fidelity measure
 
         """
         if self.is_unitary:
             assert self.current_unitary.shape == self.goal_unitary.shape
-            fid = fidelity(Qobj(self.current_unitary)*self.basis_state,Qobj(self.goal_unitary)*self.basis_state)
+            fid = fidelity(Qobj(self.current_unitary)*self.basis_state,
+                           Qobj(self.goal_unitary)*self.basis_state)
         else:
             assert len(self.current_state) == len(self.goal_state)
-            fid = fidelity(Qobj([self.current_state]),Qobj([self.goal_state]))
+            fid = fidelity(Qobj([self.current_state]), Qobj([self.goal_state]))
 
         return fid
 
-    def set_gate_group(self,gate_group,custom_gates=None):
-        """ 
+    def set_gate_group(self, gate_group, custom_gates=None):
+        """
         Defines the gate group to be used within the enviroment
-            
+
         Args:
             gate_group (str): name of the gate group used
-            custom_gates (dict): A set of custom gates may be defined using a dictionary, the form looks like{"gate_name":gate_function}
+            custom_gates (dict): A set of custom gates may be defined using a dictionary,
+                                 the form looks like{"gate_name":gate_function}
 
-        Returns: 
+        Returns:
             None
 
         """
@@ -258,7 +280,7 @@ class QuantCircuitEnv(gym.Env):
                 self.qcircuit.t
             ]
 
-        elif gate_group =='pauli':
+        elif gate_group == 'pauli':
             self.gate_group_list = [
                 self.qcircuit.iden,
                 self.qcircuit.h,
@@ -271,11 +293,14 @@ class QuantCircuitEnv(gym.Env):
             self.gate_group_list = [
                 self.qcircuit.iden,
                 self.qcircuit.t,
-                (2,self.c_s_gate)
+                (2, self.c_s_gate)
             ]
-            # Sets up the circuit with initial hadamard gates, as is necessary for circuits with the IQP format
-            temp_state = (hadamard_transform(self.num_qubits)*qubit_states(self.num_qubits)).full()
-            self.qcircuit.initialize(temp_state.flatten(),[self.q_reg[i] for i in range(self.num_qubits)])
+            # Sets up the circuit with initial hadamard gates,
+            # as is necessary for circuits with the IQP format
+            temp_state = (hadamard_transform(self.num_qubits)*
+                          qubit_states(self.num_qubits)).full()
+            self.qcircuit.initialize(temp_state.flatten(),
+                                     [self.q_reg[i] for i in range(self.num_qubits)])
 
 
         elif gate_group == 'custom':
@@ -283,13 +308,12 @@ class QuantCircuitEnv(gym.Env):
             self.gate_group_list = custom_gates
 
         else:
-            raise("%s gate_group not defined!"%gate_group)
-            
-        return None
-        
+            raise "%s gate_group not defined!"%gate_group
+
     def _create_gates(self):
         """
-        Create a list of gate/qubit tuples that contains all possible combinations given a defined qubit connectivity
+        Create a list of gate/qubit tuples that contains all possible combinations
+        given a defined qubit connectivity.
 
         Return:
             gate_list (list): list of tuples of all qubit/gate combinations
@@ -299,40 +323,44 @@ class QuantCircuitEnv(gym.Env):
 
         for gates in self.gate_group_list:
 
-            if isinstance(gates,tuple):
-                gate_qubits=gates[0]
+            if isinstance(gates, tuple):
+                gate_qubits = gates[0]
                 gates = gates[1]
 
             else:
-            # Qiskit defines the gate function as 'iden', but in the descriptions of a circuit object calls the identity 'id' - changed to make valid key for the dictionary
+            # Qiskit defines the gate function as 'iden',
+            # but in the descriptions of a circuit object calls the identity 'id'
+            # changed to make valid key for the dictionary
                 if gates.__name__ == 'iden':
                     name = 'id'
                 else:
                     name = gates.__name__
-                gate_qubits=self.qcircuit.definitions[str(name)]['n_bits']
+                gate_qubits = self.qcircuit.definitions[str(name)]['n_bits']
 
             # Check if multi-qubit gate (currently max is 2 qubits)
             if gate_qubits > 1:
                 for qubits_t in range(self.num_qubits):
                     for qubits_c in range(self.num_qubits):
                         # Check for connectivity, and don't allow connection with self
-                        if self.connectivity[qubits_t,qubits_c] == 1  and qubits_t != qubits_c:
-                            gate_list.append(((qubits_t,qubits_c),gates))
+                        if self.connectivity[qubits_t, qubits_c] == 1  and qubits_t != qubits_c:
+                            gate_list.append(((qubits_t, qubits_c), gates))
             else:
                 # Assumption made that these are single-qubit gates
                 for i in range(self.num_qubits):
-                    gate_list.append(((i,),gates))
+                    gate_list.append(((i, ), gates))
 
         return gate_list
 
-    def define_connectivity(self,connectivity,custom_matrix=None):
+    def define_connectivity(self, connectivity, custom_matrix=None):
         """
         Creates a binary matrix that describes the connections between qubits
 
         Args:
             connectivity (str): string representation of connectivity format
-            custom_matrix (np.array): binary array with index pairs denoting a connection between those two qubits i.e. (i,j) = 1 if qubit i is connected
-                                      to qubit j. This is a one way mapping, if two way connectivity is desired the array must be symmetric about the diagonal.
+            custom_matrix (np.array): binary array with index pairs denoting a connection between
+                                      those two qubits i.e. (i,j) = 1 if qubit i is connected to
+                                      qubit j. This is a one way mapping, if two way connectivity is
+                                      desired the array must be symmetric about the diagonal.
 
         Return:
             None
@@ -340,66 +368,67 @@ class QuantCircuitEnv(gym.Env):
         """
         connectivity_matrix = np.identity(self.num_qubits)
         connectivity = connectivity.lower()
-        assert connectivity in ['nearest_neighbour','fully_connected','custom','ibm']
+        assert connectivity in ['nearest_neighbour', 'fully_connected', 'custom', 'ibm']
         if connectivity == 'nearest_neighbour':
             for i in range(self.num_qubits-1):
-                connectivity_matrix[i,i+1] = 1
-                connectivity_matrix[i+1,i] = 1
+                connectivity_matrix[i, i+1] = 1
+                connectivity_matrix[i+1, i] = 1
 
             # Connects extremities
-            connectivity_matrix[0,self.num_qubits-1] == 1
-            connectivity_matrix[self.num_qubits-1,0] == 1
+            connectivity_matrix[0, self.num_qubits-1] == 1
+            connectivity_matrix[self.num_qubits-1, 0] == 1
 
         elif connectivity == 'fully_connected':
             #fully conencted mean every conenction is allowable
-            connectivity_matrix = np.ones((self.num_qubits,self.num_qubits))
+            connectivity_matrix = np.ones((self.num_qubits, self.num_qubits))
 
         elif connectivity == "custom":
-            assert np.asarray(custom_matrix).shape == (self.num_qubits,self.num_qubits), "Dimension mismatch!"
+            assert np.asarray(custom_matrix).shape == ((self.num_qubits, self.num_qubits),
+                                                       "Dimension mismatch!")
             connectivity_matrix = custom_matrix
 
         elif connectivity == "ibm":
-            assert self.num_qubits in [5,14,20]
+            assert self.num_qubits in [5, 14, 20]
             # Based on IBMQ 5 Tenerife and IBMQ 5 Yorktown
             if self.num_qubits == 5:
-                connectivity_matrix = np.array([[0,1,1,0,0],
-                                                [1,0,1,0,0,],
-                                                [1,1,0,1,1],
-                                                [0,0,1,0,1],
-                                                [0,0,1,1,0]])
+                connectivity_matrix = np.array([[0, 1, 1, 0, 0],
+                                                [1, 0, 1, 0, 0],
+                                                [1, 1, 0, 1, 1],
+                                                [0, 0, 1, 0, 1],
+                                                [0, 0, 1, 1, 0]])
             # Based on IBMQ 14 Melbourne
             elif self.num_qubits == 14:
-                connectivity_matrix = np.zeros((14,14))
+                connectivity_matrix = np.zeros((14, 14))
                 for i in range(14):
                     for j in range(14):
                         if i + j == 14:
-                            connectivity_matrix[(i,j)] = 1
+                            connectivity_matrix[(i, j)] = 1
                 for i in range(13):
                     if i != 6:
-                        connectivity_matrix[(i,i+1)] = 1
+                        connectivity_matrix[(i, i+1)] = 1
 
             # Based on IBMQ 20 Tokyo
             elif self.num_qubits == 20:
-                connectivity_matrix = np.zeros((20,20))
-                for k in [0,5,10,15]:
-                    for j in range(k,k+4):
-                        connectivity_matrix[(j,j+1)] = 1
+                connectivity_matrix = np.zeros((20, 20))
+                for k in [0, 5, 10, 15]:
+                    for j in range(k, k+4):
+                        connectivity_matrix[(j, j+1)] = 1
                 for k in range(5):
-                    connectivity_matrix[(k,k+5)] = 1
-                    connectivity_matrix[(k+5,k+10)] = 1
-                    connectivity_matrix[(k+10,k+15)] = 1
-                for k in [1,3,5,7,11,13]:
-                    connectivity_matrix[(k,k+6)] = 1
-                for k in [2,4,6,8,12,14]:
-                    connectivity_matrix[(k,k+4)] = 1
+                    connectivity_matrix[(k, k+5)] = 1
+                    connectivity_matrix[(k+5, k+10)] = 1
+                    connectivity_matrix[(k+10, k+15)] = 1
+                for k in [1, 3, 5, 7, 11, 13]:
+                    connectivity_matrix[(k, k+6)] = 1
+                for k in [2, 4, 6, 8, 12, 14]:
+                    connectivity_matrix[(k, k+4)] = 1
 
         self.connectivity = connectivity_matrix
 
     def plot_connectivity_graph(self):
         """
         Draws a graph of nodes and edges that represents the physical connectivity of the qubits.
-        Graph will not be completely symmetric and will not be an exact replica of the framework, but will 
-        provide an accurate visual representation of the connections between qubits.
+        Graph will not be completely symmetric and will not be an exact replica of the framework,
+        but will provide an accurate visual representation of the connections between qubits.
 
         Returns:
             None
@@ -409,12 +438,10 @@ class QuantCircuitEnv(gym.Env):
         graph.add_nodes_from([i for i in range(self.num_qubits)])
         for i in range(self.num_qubits):
             for j in range(self.num_qubits):
-                if self.connectivity[(i,j)] == 1:
-                    graph.add_edge(i,j)
-        nx.draw(graph,with_labels=True,font_weight='bold')
-
-        return None
-
+                if self.connectivity[(i, j)] == 1:
+                    graph.add_edge(i, j)
+        nx.draw(graph, with_labels=True, font_weight='bold')
+        plt.show()
 
     def trace_norm(self):
         """
@@ -431,11 +458,11 @@ class QuantCircuitEnv(gym.Env):
         density_1 = current*current.dag()
         density_2 = goal*goal.dag()
 
-        dist = tracedist(density_1,density_2)
-        
+        dist = tracedist(density_1, density_2)
+
         return dist
 
-    def c_s_gate(self,target,control):
+    def c_s_gate(self, target, control):
         """
         Creates custom composite gate from defined qiskit gates that is contained in the IQP group
 
@@ -447,14 +474,13 @@ class QuantCircuitEnv(gym.Env):
             None
         """
 
-        #we need to create a controlled-S gate using simple gates from qiskit, this can be done using cnots and T gates + T_dag
-        self.qcircuit.cx(control,target)
+        # We need to create a controlled-S gate using simple gates from qiskit,
+        # this can be done using cnots and T gates + T_dag
+        self.qcircuit.cx(control, target)
         self.qcircuit.tdg(target)
-        self.qcircuit.cx(control,target)
+        self.qcircuit.cx(control, target)
         self.qcircuit.t(target)
         self.qcircuit.t(control)
-
-        return None
 
     def make_curriculum(self, num_gates, loop_list=None):
         """
@@ -467,28 +493,27 @@ class QuantCircuitEnv(gym.Env):
         Return:
             curriculum (list): list of goal unitaries/statevectors for the agent to target
             tracker (array): array of how many goals found in each section
-            
+
         """
         if not loop_list is None:
-            assert len(loop_list) == num_gates, 'List of number of loops for each gate must have length num_gates'
+            assert len(loop_list) == num_gates, ('List of number of loops for each gate'
+            'must have length num_gates')
 
-        num_qubits = self.num_qubits
-        unitary = self.is_unitary
         loop_num = 0
         gate_group_n = len(self.gate_group_list)
-        curriculum, state_check, tracker = ([],[],[])
+        curriculum, state_check, tracker = ([], [], [])
         self.gate_list = self._create_gates()
         num_moves = len(self.gate_list)
-        moves = np.linspace(0,num_moves-1,num_moves)
-        
-        for j in range(0,num_gates):
+        moves = np.linspace(0, num_moves-1, num_moves)
+
+        for j in range(0, num_gates):
             max_gates = j+1
             curriculum_sect = []
             if max_gates < 4:
                 all_moves = [p for p in it.product(moves, repeat=max_gates)]
             else:
                 all_moves = np.zeros(5000)
-            for k in range(0,len(all_moves)):
+            for k in range(0, len(all_moves)):
                 self.reset()
                 self.set_gate_group(self.gate_group)
                 l = 0
@@ -496,39 +521,41 @@ class QuantCircuitEnv(gym.Env):
                 while l != max_gates:
                     if max_gates >= 4:
                         #randomly search combinations
-                        i = np.random.randint(0,num_moves)
+                        i = np.random.randint(0, num_moves)
                     else:
                         #move through every combination
                         i = move_set[l]
-                    self.gate_list=self._create_gates()
+                    self.gate_list = self._create_gates()
                     tple = self.gate_list[int(i)]
-                    if len(tple[0])>1:
-                        tple[1](self.q_reg[tple[0][0]],self.q_reg[tple[0][1]])
-
+                    if len(tple[0]) > 1:
+                        tple[1](self.q_reg[tple[0][0]], self.q_reg[tple[0][1]])
                     else:
                         tple[1](self.q_reg[tple[0][0]])
 
                     l += 1
 
-                else:    
-                    job2=execute(self.qcircuit,backend=qiskit.BasicAer.get_backend('statevector_simulator'))
+                else:
+                    job2 = execute(self.qcircuit,
+                                   backend=qiskit.BasicAer.get_backend('statevector_simulator'))
                     state_to_check = job2.result().get_statevector(self.qcircuit)
                     for i in range(len(state_to_check.real)):
-                        state_to_check.real[i] = np.round(state_to_check.real[i],4)
-                        state_to_check.imag[i] = np.round(state_to_check.imag[i],4)
-                    
-                    if self.is_unitary == True:
-                        job=execute(self.qcircuit,backend=qiskit.BasicAer.get_backend('unitary_simulator'))
+                        state_to_check.real[i] = np.round(state_to_check.real[i], 4)
+                        state_to_check.imag[i] = np.round(state_to_check.imag[i], 4)
+
+                    if self.is_unitary:
+                        job = execute(self.qcircuit,
+                                      backend=qiskit.BasicAer.get_backend('unitary_simulator'))
                         current_state = job.result().get_unitary(self.qcircuit)
                         for i in range(len(current_state.real)):
                             for j in range(len(current_state[0].real)):
-                                current_state.real[i][j] = np.round(current_state.real[i][j],4)
-                                current_state.imag[i][j] = np.round(current_state.imag[i][j],4)
+                                current_state.real[i][j] = np.round(current_state.real[i][j], 4)
+                                current_state.imag[i][j] = np.round(current_state.imag[i][j], 4)
                     else:
                         current_state = state_to_check
-                    
+
                     if len(state_check) >= 1:
-                        if any(np.equal(state_check,state_to_check).all(1)) or any(np.equal(state_check,-state_to_check).all(1)):
+                        if (any(np.equal(state_check, state_to_check).all(1)) or
+                        any(np.equal(state_check, -state_to_check).all(1))):
                             pass
                         else:
                             curriculum_sect.append(current_state)
@@ -537,9 +564,8 @@ class QuantCircuitEnv(gym.Env):
                         curriculum_sect.append(current_state)
                         state_check.append(state_to_check)
 
-                #print('step '+str(k)+' found '+str(len(curriculum_sect))+' in section num_gates = '+str(max_gates))
             tracker.append(len(curriculum_sect))
-            if loop_list == None:
+            if loop_list is None:
                 loop = 1
             else:
                 loop = loop_list[loop_num]
