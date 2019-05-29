@@ -14,7 +14,7 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="includeme.html" />
+    <link rel="next" title="Gym Environment for Quantum Circuit Synthesis (using qiskit and qutip)" href="includeme.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -31,220 +31,18 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="module-gym_quantcircuit">
-<span id="welcome-to-quantumcircuit-gym-s-documentation"></span><h1>Welcome to quantumcircuit_gym’s documentation!<a class="headerlink" href="#module-gym_quantcircuit" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv">
-<em class="property">class </em><code class="descclassname">gym_quantcircuit.envs.</code><code class="descname">QuantCircuitEnv</code><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.c_s_gate">
-<code class="descname">c_s_gate</code><span class="sig-paren">(</span><em>target</em>, <em>control</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.c_s_gate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates custom composite gate from defined qiskit gates that is contained in the IQP group</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>target</strong> (<em>int</em>) – index of the target qubit</p></li>
-<li><p><strong>control</strong> (<em>int</em>) – index of the control qubit</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.define_connectivity">
-<code class="descname">define_connectivity</code><span class="sig-paren">(</span><em>connectivity</em>, <em>custom_matrix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.define_connectivity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a binary matrix that describes the connections between qubits</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>connectivity</strong> (<em>str</em>) – string representation of connectivity format</p></li>
-<li><p><strong>custom_matrix</strong> (<em>np.array</em>) – binary array with index pairs denoting a connection between those two qubits i.e. (i,j) = 1 if qubit i is connected
-to qubit j. This is a one way mapping, if two way connectivity is desired the array must be symmetric about the diagonal.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.define_goal">
-<code class="descname">define_goal</code><span class="sig-paren">(</span><em>goal_state</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.define_goal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines goal statevector or unitary matrix for the circuit.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>goal_state</strong> (<em>list</em>) – flattened statevector or unitary matrix</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.fidelity">
-<code class="descname">fidelity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.fidelity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates fidelity of current and goal state/unitary.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>fidelity measure</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>fid (float)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.make_curriculum">
-<code class="descname">make_curriculum</code><span class="sig-paren">(</span><em>num_gates</em>, <em>loop_list=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.make_curriculum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Designs curriculum for agent which gradually increases goal difficulty.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_gates</strong> (<em>int</em>) – max number of gates for a circuit in the curriculum</p></li>
-<li><p><strong>loop_list</strong> (<em>list</em>) – A list of times you want to loop each curriculum stage</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>list of goal unitaries/statevectors for the agent to target
-tracker (array): array of how many goals found in each section</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>curriculum (list)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.plot_connectivity_graph">
-<code class="descname">plot_connectivity_graph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.plot_connectivity_graph" title="Permalink to this definition">¶</a></dt>
-<dd><p>Draws a graph of nodes and edges that represents the physical connectivity of the qubits.
-Graph will not be completely symmetric and will not be an exact replica of the framework, but will
-provide an accurate visual representation of the connections between qubits.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.render">
-<code class="descname">render</code><span class="sig-paren">(</span><em>close=False</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.render" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>text drawing of the current circuit represented by the QuantumCircuit object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.reset">
-<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.reset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Resets the circuit to empty and any relevant variables to their initial state</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>real and imaginary parts of the current reset quantum state/unitary</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>diff (list)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.sample">
-<code class="descname">sample</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.sample" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>a specific action in the circuit environment action space</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>action (int)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.set_gate_group">
-<code class="descname">set_gate_group</code><span class="sig-paren">(</span><em>gate_group</em>, <em>custom_gates=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.set_gate_group" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines the gate group to be used within the enviroment</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>gate_group</strong> (<em>str</em>) – name of the gate group used</p></li>
-<li><p><strong>custom_gates</strong> (<em>dict</em>) – A set of custom gates may be defined using a dictionary, the form looks like{“gate_name”:gate_function}</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.step">
-<code class="descname">step</code><span class="sig-paren">(</span><em>action</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.step" title="Permalink to this definition">¶</a></dt>
-<dd><p>Takes a single step (action) inside the environment</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>action</strong> (<em>int</em>) – index of the action in self.gate_list generated by self._create_gates - containing all combinations of legal qubit/gate combinations</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>difference between current and goal state
-reward (float): reward gained from taking the specified action
-done (bool): True if agent has reached the goal, False otherwise
-measures (dict): dictionary containing the measure used to determine reward</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>diff (np.array)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.trace_norm">
-<code class="descname">trace_norm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.trace_norm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates trace norms of density state of matrix - to use this as a metric,
-take the difference (p_0 - p_1) and return the value of the trace distance</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>trace distance of difference between density matrices</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>dist (float)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="gym_quantcircuit.envs.QuantCircuitEnv.var_init">
-<code class="descname">var_init</code><span class="sig-paren">(</span><em>num_qubits</em>, <em>unitary=False</em>, <em>gate_group='pauli'</em>, <em>connectivity='nearest_neighbour'</em>, <em>goal_state=None</em>, <em>goal_unitary=None</em>, <em>custom_gates=None</em>, <em>custom_connectivity=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gym_quantcircuit.envs.QuantCircuitEnv.var_init" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialises the Quantum Circuit Environment object with arguments since gym.make can’t do this.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_qubits</strong> (<em>int</em>) – number of qubits in the desired circuit</p></li>
-<li><p><strong>unitary</strong> (<em>bool</em>) – if True sets environment to use unitary matrices, otherwise uses statevectors</p></li>
-<li><p><strong>gate_group</strong> (<em>str</em>) – string to define the gate group used, options include ‘pauli’,’clifford’ and ‘IQP’</p></li>
-<li><p><strong>goal_state</strong> (<em>list</em>) – list of complex values defining goal statevector - must have 2**num_qubits values</p></li>
-<li><p><strong>goal_unitary</strong> (<em>np.array</em>) – goal unitary matrix - must have shape (2**num_qubits,2**num_qubits)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="welcome-to-quantumcircuit-gym-s-documentation">
+<h1>Welcome to quantumcircuit_gym’s documentation!<a class="headerlink" href="#welcome-to-quantumcircuit-gym-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Gym Environment for Quantum Circuit Synthesis (using qiskit and qutip)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="includeme.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="includeme.html#example-use">Example use</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html#module-gym_quantcircuit">Documentation</a></li>
+</ul>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -273,12 +71,17 @@ take the difference (p_0 - p_1) and return the value of the trace distance</p>
 
 
 <h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Gym Environment for Quantum Circuit Synthesis (using qiskit and qutip)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html#module-gym_quantcircuit">Documentation</a></li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="includeme.html" title="next chapter">&lt;no title&gt;</a></li>
+      <li>Next: <a href="includeme.html" title="next chapter">Gym Environment for Quantum Circuit Synthesis (using qiskit and qutip)</a></li>
   </ul></li>
 </ul>
 </div>
