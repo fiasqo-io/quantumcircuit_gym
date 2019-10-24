@@ -18,7 +18,7 @@ mpmath==1.1.0
 networkx==2.2
 ntlm-auth==1.2.0
 numpy==1.16.1
-Pillow==5.4.1
+Pillow==6.2.0
 ply==3.11
 psutil==5.5.0
 pycparser==2.19
