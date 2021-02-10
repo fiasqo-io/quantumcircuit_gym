@@ -2,7 +2,7 @@ asn1crypto==0.24.0
 certifi==2018.11.29
 cffi==1.11.5
 chardet==3.0.4
-cryptography==3.2
+cryptography==3.3.2
 cycler==0.10.0
 Cython==0.29.5
 decorator==4.3.2
